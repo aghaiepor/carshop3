@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('cars.urls')),
+    path("ckeditor/", include("ckeditor_uploader.urls")),  # Added CKEditor path
 ]
 
 if settings.DEBUG:

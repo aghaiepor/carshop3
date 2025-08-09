@@ -1,20 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - Car Shop{% endblock %}
+{% block title %}خانه - {{ site_settings.site_name }}{% endblock %}
 
 {% block content %}
 <div class="hero-section">
     <div class="container text-center">
-        <h1 class="display-4 mb-4">Find Your Perfect Car</h1>
-        <p class="lead mb-4">Discover our extensive collection of quality vehicles at unbeatable prices</p>
-        <a href="{% url 'car_list' %}" class="btn btn-light btn-lg">
-            <i class="fas fa-search"></i> Browse Cars
+        <h1 class="display-5 mb-3">{{ site_settings.hero_title }}</h1>
+        {% if site_settings.hero_subtitle %}
+        <p class="lead mb-4">{{ site_settings.hero_subtitle }}</p>
+        {% endif %}
+        {% if site_settings.hero_cta_label and site_settings.hero_cta_url %}
+        <a href="{{ site_settings.hero_cta_url }}" class="btn btn-light btn-lg">
+            <i class="fas fa-search"></i> {{ site_settings.hero_cta_label }}
         </a>
+        {% endif %}
     </div>
 </div>
 
 <div class="container my-5">
-    <h2 class="text-center mb-5">Featured Cars</h2>
+    <h2 class="text-center mb-5">خودروهای ویژه</h2>
     <div class="row">
         {% for car in featured_cars %}
         <div class="col-md-4 mb-4">
@@ -28,11 +32,11 @@
                 {% endif %}
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ car.title }}</h5>
-                    <p class="card-text text-muted">{{ car.year }} • {{ car.mileage|floatformat:0 }} km</p>
+                    <p class="card-text text-muted">{{ car.year }} • {{ car.mileage|floatformat:0 }} کیلومتر</p>
                     <div class="mt-auto">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="price-tag">${{ car.price|floatformat:0 }}</span>
-                            <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary btn-sm">View Details</a>
+                            <span class="price-tag">{{ car.price|floatformat:0 }} تومان</span>
+                            <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary btn-sm">جزئیات</a>
                         </div>
                     </div>
                 </div>
@@ -40,7 +44,7 @@
         </div>
         {% empty %}
         <div class="col-12 text-center">
-            <p class="text-muted">No featured cars available at the moment.</p>
+            <p class="text-muted">در حال حاضر خودروی ویژه‌ای موجود نیست.</p>
         </div>
         {% endfor %}
     </div>
@@ -48,7 +52,7 @@
 
 <div class="bg-light py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Popular Brands</h2>
+        <h2 class="text-center mb-5">برندهای محبوب</h2>
         <div class="row">
             {% for brand in brands %}
             <div class="col-md-3 col-sm-6 mb-4">
@@ -58,7 +62,7 @@
                             <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="img-fluid mb-3" style="max-height: 60px;">
                         {% endif %}
                         <h5 class="card-title">{{ brand.name }}</h5>
-                        <a href="{% url 'brand_cars' brand.pk %}" class="btn btn-outline-primary btn-sm">View Cars</a>
+                        <a href="{% url 'brand_cars' brand.pk %}" class="btn btn-outline-primary btn-sm">مشاهده خودروها</a>
                     </div>
                 </div>
             </div>

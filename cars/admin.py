@@ -1,10 +1,28 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Brand, Category, Car, CarImage, Inquiry
+from .models import Brand, Category, Car, CarImage, Inquiry, SiteSettings
+from django import forms
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class CarImageInline(admin.TabularInline):
     model = CarImage
     extra = 1
+
+class SiteSettingsForm(forms.ModelForm):
+    header_html = forms.CharField(
+        label="HTML هدر (اختیاری)",
+        required=False,
+        widget=CKEditorUploadingWidget()
+    )
+    footer_html = forms.CharField(
+        label="HTML پاورقی",
+        required=False,
+        widget=CKEditorUploadingWidget()
+    )
+
+    class Meta:
+        model = SiteSettings
+        fields = "__all__"
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -51,6 +69,27 @@ class InquiryAdmin(admin.ModelAdmin):
     search_fields = ['name', 'email', 'car__title']
     list_editable = ['is_read']
     readonly_fields = ['created_at']
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    form = SiteSettingsForm
+    fieldsets = (
+        ("سرتیتر", {
+            'fields': ('site_name', 'logo', 'primary_color', 'secondary_color', 'header_html')
+        }),
+        ("بخش هرو (صفحه اصلی)", {
+            'fields': ('hero_title', 'hero_subtitle', 'hero_cta_label', 'hero_cta_url')
+        }),
+        ("پاورقی و تماس", {
+            'fields': ('contact_phone', 'contact_email', 'contact_address', 'footer_html')
+        }),
+    )
+
+    def has_add_permission(self, request):
+        # Limit to a single instance
+        if SiteSettings.objects.exists():
+            return False
+        return super().has_add_permission(request)
 
 admin.site.site_header = "پنل مدیریت فروشگاه خودرو"
 admin.site.site_title = "مدیریت فروشگاه خودرو"

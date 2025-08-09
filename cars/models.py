@@ -108,3 +108,43 @@ class Inquiry(models.Model):
         verbose_name = _("استعلام")
         verbose_name_plural = _("استعلام‌ها")
         ordering = ['-created_at']
+
+
+class SiteSettings(models.Model):
+    # Header
+    site_name = models.CharField(max_length=150, default="فروشگاه خودرو")
+    logo = models.ImageField(upload_to='site/', blank=True, null=True)
+    # Colors (optional)
+    primary_color = models.CharField(max_length=20, blank=True, default="#0ea5e9")
+    secondary_color = models.CharField(max_length=20, blank=True, default="#10b981")
+
+    # Hero section
+    hero_title = models.CharField(max_length=200, default="خودروی مورد نظرت را پیدا کن")
+    hero_subtitle = models.CharField(max_length=300, blank=True, default="مجموعه‌ای گسترده از خودروهای باکیفیت با قیمت‌های رقابتی")
+    hero_cta_label = models.CharField(max_length=80, default="مشاهده خودروها")
+    hero_cta_url = models.CharField(max_length=200, default="/cars/")
+
+    # Footer and contact
+    contact_phone = models.CharField(max_length=50, blank=True, default="+98 21 1234 5678")
+    contact_email = models.EmailField(blank=True, default="info@carshop.test")
+    contact_address = models.CharField(max_length=200, blank=True, default="تهران، خیابان خودرو، پلاک ۱۲۳")
+    footer_html = models.TextField(blank=True, default="© ۱۴۰۳ فروشگاه خودرو. کلیه حقوق محفوظ است.")
+
+    # Extra HTML (optional)
+    header_html = models.TextField(blank=True, default="")
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("تنظیمات سایت")
+        verbose_name_plural = _("تنظیمات سایت")
+
+    def __str__(self):
+        return "Site Settings"
+
+    @staticmethod
+    def get_solo():
+        obj = SiteSettings.objects.first()
+        if not obj:
+            obj = SiteSettings.objects.create()
+        return obj

@@ -1,0 +1,28 @@
+/* Global RTL and Persian-friendly styles */
+html {
+  direction: rtl;
+}
+body {
+  text-align: right;
+}
+
+/* Navbar adjustments */
+.navbar .navbar-brand,
+.navbar .nav-link {
+  font-weight: 600;
+}
+
+/* Cards */
+.card .card-title {
+  font-weight: 700;
+}
+
+/* Buttons rounded */
+.btn {
+  border-radius: 8px;
+}
+
+/* Footer tweaks */
+footer ul {
+  padding-right: 1rem;
+}
