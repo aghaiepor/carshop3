@@ -52,6 +52,6 @@ class InquiryAdmin(admin.ModelAdmin):
     list_editable = ['is_read']
     readonly_fields = ['created_at']
 
-admin.site.site_header = "Car Shop Administration"
-admin.site.site_title = "Car Shop Admin"
-admin.site.index_title = "Welcome to Car Shop Administration"
+admin.site.site_header = "پنل مدیریت فروشگاه خودرو"
+admin.site.site_title = "مدیریت فروشگاه خودرو"
+admin.site.index_title = "به پنل مدیریت خوش آمدید"

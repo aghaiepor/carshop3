@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
@@ -12,6 +13,8 @@ class Brand(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("برند")
+        verbose_name_plural = _("برندها")
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -22,7 +25,8 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = "Categories"
+        verbose_name = _("دسته‌بندی")
+        verbose_name_plural = _("دسته‌بندی‌ها")
         ordering = ['name']
 
 class Car(models.Model):
@@ -71,6 +75,8 @@ class Car(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = _("خودرو")
+        verbose_name_plural = _("خودروها")
 
 class CarImage(models.Model):
     car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
@@ -83,6 +89,8 @@ class CarImage(models.Model):
 
     class Meta:
         ordering = ['-is_primary', 'created_at']
+        verbose_name = _("تصویر خودرو")
+        verbose_name_plural = _("تصاویر خودرو")
 
 class Inquiry(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
@@ -97,5 +105,6 @@ class Inquiry(models.Model):
         return f"Inquiry for {self.car.title} by {self.name}"
 
     class Meta:
-        verbose_name_plural = "Inquiries"
+        verbose_name = _("استعلام")
+        verbose_name_plural = _("استعلام‌ها")
         ordering = ['-created_at']

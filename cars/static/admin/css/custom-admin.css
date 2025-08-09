@@ -1,0 +1,72 @@
+/* RTL-friendly admin customizations (Django >= 4) */
+
+/* Force RTL direction for safety when in Persian */
+html {
+  direction: rtl;
+}
+
+/* General background for admin pages */
+body {
+  background-color: #f1f5f9; /* slate-100-ish */
+}
+
+/* Header styling */
+#header {
+  background: linear-gradient(90deg, #0ea5e9 0%, #10b981 100%); /* cyan to emerald */
+  border-bottom: none;
+}
+
+#header #site-name a {
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+#user-tools,
+#user-tools a {
+  color: #ecfeff; /* light cyan */
+}
+
+/* Modules and content cards */
+.module,
+#content-related,
+#content-main .module,
+#content {
+  border-radius: 10px;
+}
+
+.module caption {
+  text-align: right; /* RTL tables */
+}
+
+/* Login page */
+body.login {
+  background-color: #0f172a; /* slate-900 */
+}
+
+.login #container {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.login #header h1 a {
+  color: #ffffff;
+}
+
+/* Breadcrumbs direction */
+.breadcrumbs {
+  float: left; /* In RTL, default flows right; keep breadcrumb on left if preferred */
+}
+
+/* Align change-list filters and actions for RTL */
+.change-list .actions label {
+  margin-left: 8px;
+  margin-right: 0;
+}
+
+/* Buttons slight rounding */
+.button,
+.submit-row input[type="submit"],
+.submit-row a.deletelink {
+  border-radius: 8px;
+}
