@@ -1,15 +1,10 @@
-# Generated initial migration for cars app
+# Initial migration for cars app
 from django.db import migrations, models
 import django.db.models.deletion
 
-
 class Migration(migrations.Migration):
-
     initial = True
-
-    dependencies = [
-    ]
-
+    dependencies = []
     operations = [
         migrations.CreateModel(
             name='Brand',
@@ -20,9 +15,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
-            options={
-                'ordering': ['name'],
-            },
+            options={'ordering': ['name']},
         ),
         migrations.CreateModel(
             name='Category',
@@ -32,10 +25,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
-            options={
-                'verbose_name_plural': 'Categories',
-                'ordering': ['name'],
-            },
+            options={'verbose_name_plural': 'Categories', 'ordering': ['name']},
         ),
         migrations.CreateModel(
             name='Car',
@@ -59,9 +49,7 @@ class Migration(migrations.Migration):
                 ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cars.brand')),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cars.category')),
             ],
-            options={
-                'ordering': ['-created_at'],
-            },
+            options={'ordering': ['-created_at']},
         ),
         migrations.CreateModel(
             name='CarImage',
@@ -72,9 +60,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('car', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='cars.car')),
             ],
-            options={
-                'ordering': ['-is_primary', 'created_at'],
-            },
+            options={'ordering': ['-is_primary', 'created_at']},
         ),
         migrations.CreateModel(
             name='Inquiry',
@@ -88,9 +74,6 @@ class Migration(migrations.Migration):
                 ('is_read', models.BooleanField(default=False)),
                 ('car', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='cars.car')),
             ],
-            options={
-                'verbose_name_plural': 'Inquiries',
-                'ordering': ['-created_at'],
-            },
+            options={'verbose_name_plural': 'Inquiries', 'ordering': ['-created_at']},
         ),
     ]

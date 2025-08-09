@@ -1,161 +1,92 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load cars_extras %}
 
-{% block title %}{{ car.title }} - Car Shop{% endblock %}
+{% block title %}{{ car.title }} - {{ site_settings.site_name }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <div class="row">
-        <div class="col-md-8">
-            <!-- Car Images -->
-            <div class="card mb-4">
-                {% if car.images.first %}
-                    <img src="{{ car.images.first.image.url }}" class="card-img-top" alt="{{ car.title }}" style="height: 400px; object-fit: cover;">
-                {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
-                        <i class="fas fa-car fa-5x text-muted"></i>
-                    </div>
-                {% endif %}
-                
-                {% if car.images.all|length > 1 %}
-                <div class="card-body">
-                    <div class="row">
-                        {% for image in car.images.all %}
-                            {% if not image.is_primary %}
-                            <div class="col-3 mb-2">
-                                <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ car.title }}" style="height: 80px; object-fit: cover; width: 100%;">
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Car Details -->
-            <div class="card">
-                <div class="card-body">
-                    <h1 class="card-title">{{ car.title }}</h1>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h4 class="text-success">${{ car.price|floatformat:0 }}</h4>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <span class="badge bg-primary">{{ car.status|title }}</span>
-                            {% if car.is_featured %}
-                                <span class="badge bg-warning">Featured</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <strong>Brand:</strong><br>
-                            {{ car.brand.name }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Year:</strong><br>
-                            {{ car.year }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Mileage:</strong><br>
-                            {{ car.mileage|floatformat:0 }} km
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Fuel Type:</strong><br>
-                            {{ car.fuel_type|title }}
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <strong>Transmission:</strong><br>
-                            {{ car.transmission|title }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Engine Size:</strong><br>
-                            {{ car.engine_size }}L
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Color:</strong><br>
-                            {{ car.color }}
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Category:</strong><br>
-                            {{ car.category.name }}
-                        </div>
-                    </div>
-                    
-                    <h5>Description</h5>
-                    <p>{{ car.description }}</p>
-                    
-                    {% if car.features %}
-                    <h5>Features</h5>
-                    <div class="mb-3">
-                        {% for feature in car.features|split:"," %}
-                            <span class="feature-badge">{{ feature.strip }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        {% if car.images.first %}
+          <img src="{{ car.images.first.image.url }}" class="card-img-top" alt="{{ car.title }}" style="height: 400px; object-fit: cover;">
+        {% else %}
+          <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+            <i class="fas fa-car fa-5x text-muted"></i>
+          </div>
+        {% endif %}
+
+        {% if car.images.all|length > 1 %}
+        <div class="card-body">
+          <div class="row">
+            {% for image in car.images.all %}
+              {% if not image.is_primary %}
+              <div class="col-3 mb-2">
+                <img src="{{ image.image.url }}" class="img-fluid rounded" alt="{{ car.title }}" style="height: 80px; object-fit: cover; width: 100%;">
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
         </div>
-        
-        <div class="col-md-4">
-            <!-- Inquiry Form -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-envelope"></i> Send Inquiry</h5>
-                </div>
-                <div class="card-body">
-                    {% crispy form %}
-                </div>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title">{{ car.title }}</h1>
+          <div class="row mb-4">
+            <div class="col-md-6"><h4 class="text-success">{{ car.price|floatformat:0 }} تومان</h4></div>
+            <div class="col-md-6 text-start">
+              <span class="badge bg-primary">{{ car.status|title }}</span>
+              {% if car.is_featured %}<span class="badge bg-warning">ویژه</span>{% endif %}
             </div>
-            
-            <!-- Contact Info -->
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-phone"></i> Contact Us</h5>
-                </div>
-                <div class="card-body">
-                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
-                    <p><i class="fas fa-envelope"></i> info@carshop.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> 123 Car Street, Auto City</p>
-                </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-3"><strong>برند:</strong><br>{{ car.brand.name }}</div>
+            <div class="col-md-3"><strong>سال:</strong><br>{{ car.year }}</div>
+            <div class="col-md-3"><strong>کارکرد:</strong><br>{{ car.mileage|floatformat:0 }} کیلومتر</div>
+            <div class="col-md-3"><strong>سوخت:</strong><br>{{ car.fuel_type|title }}</div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-3"><strong>گیربکس:</strong><br>{{ car.transmission|title }}</div>
+            <div class="col-md-3"><strong>حجم موتور:</strong><br>{{ car.engine_size }} لیتر</div>
+            <div class="col-md-3"><strong>رنگ:</strong><br>{{ car.color }}</div>
+            <div class="col-md-3"><strong>دسته‌بندی:</strong><br>{{ car.category.name }}</div>
+          </div>
+
+          <h5>توضیحات</h5>
+          <p>{{ car.description }}</p>
+
+          {% if car.features %}
+            <h5>امکانات</h5>
+            <div class="mb-3">
+              {% for feature in car.features|split:"," %}
+                <span class="feature-badge">{{ feature }}</span>
+              {% endfor %}
             </div>
+          {% endif %}
         </div>
+      </div>
     </div>
-    
-    <!-- Related Cars -->
-    {% if related_cars %}
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3>Related Cars</h3>
-            <div class="row">
-                {% for car in related_cars %}
-                <div class="col-md-3 mb-4">
-                    <div class="card car-card h-100">
-                        {% if car.images.first %}
-                            <img src="{{ car.images.first.image.url }}" class="card-img-top" alt="{{ car.title }}" style="height: 150px; object-fit: cover;">
-                        {% else %}
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
-                                <i class="fas fa-car fa-2x text-muted"></i>
-                            </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h6 class="card-title">{{ car.title }}</h6>
-                            <p class="card-text text-muted small">{{ car.year }} • {{ car.mileage|floatformat:0 }} km</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="price-tag">${{ car.price|floatformat:0 }}</small>
-                                <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary btn-sm">View</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header"><h5><i class="fas fa-envelope"></i> ارسال استعلام</h5></div>
+        <div class="card-body">{% crispy form %}</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h5><i class="fas fa-phone"></i> تماس با ما</h5></div>
+        <div class="card-body">
+          <p><i class="fas fa-phone"></i> {{ site_settings.contact_phone }}</p>
+          <p><i class="fas fa-envelope"></i> {{ site_settings.contact_email }}</p>
+          <p><i class="fas fa-map-marker-alt"></i> {{ site_settings.contact_address }}</p>
         </div>
+      </div>
     </div>
-    {% endif %}
+  </div>
 </div>
 {% endblock %}

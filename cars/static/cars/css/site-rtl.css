@@ -1,4 +1,4 @@
-/* Global RTL and Persian-friendly styles */
+/* RTL & Persian */
 html {
   direction: rtl;
 }
@@ -6,7 +6,7 @@ body {
   text-align: right;
 }
 
-/* Navbar adjustments */
+/* Navbar */
 .navbar .navbar-brand,
 .navbar .nav-link {
   font-weight: 600;
@@ -17,12 +17,12 @@ body {
   font-weight: 700;
 }
 
-/* Buttons rounded */
+/* Buttons */
 .btn {
   border-radius: 8px;
 }
 
-/* Footer tweaks */
+/* Footer */
 footer ul {
   padding-right: 1rem;
 }

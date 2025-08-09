@@ -1,9 +1,8 @@
 from django.apps import AppConfig
 
 class CarsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'cars'
+  default_auto_field = 'django.db.models.BigAutoField'
+  name = 'cars'
 
-    def ready(self):
-        # Connect signals
-        from . import signals  # noqa
+  def ready(self):
+    from . import signals  # noqa
