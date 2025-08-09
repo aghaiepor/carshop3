@@ -31,20 +31,6 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = ['title', 'model', 'brand__name']
     list_editable = ['status', 'is_featured']
     inlines = [CarImageInline]
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('title', 'brand', 'category', 'model', 'year')
-        }),
-        ('Technical Details', {
-            'fields': ('fuel_type', 'transmission', 'engine_size', 'mileage', 'color')
-        }),
-        ('Pricing & Status', {
-            'fields': ('price', 'status', 'is_featured')
-        }),
-        ('Description', {
-            'fields': ('description', 'features')
-        }),
-    )
 
 @admin.register(CarImage)
 class CarImageAdmin(admin.ModelAdmin):
@@ -66,7 +52,6 @@ class InquiryAdmin(admin.ModelAdmin):
     list_editable = ['is_read']
     readonly_fields = ['created_at']
 
-# Customize admin site
 admin.site.site_header = "Car Shop Administration"
 admin.site.site_title = "Car Shop Admin"
 admin.site.index_title = "Welcome to Car Shop Administration"

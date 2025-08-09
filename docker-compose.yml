@@ -5,33 +5,8 @@ services:
     build: .
     ports:
       - "8000:8000"
+    # Bind mount your code; the entrypoint lives in /usr/local/bin so it won't be shadowed
     volumes:
       - .:/app
-      - media_volume:/app/media
-    environment:
-      - DEBUG=1
-      - DB_HOST=sqlserver
-      - DB_NAME=carshop
-      - DB_USER=sa
-      - DB_PASSWORD=YourStrong@Passw0rd
-    depends_on:
-      - sqlserver
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong@Passw0rd
-      - MSSQL_PID=Express
-    ports:
-      - "1433:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-
-volumes:
-  sqlserver_data:
-  media_volume:
+    # IMPORTANT: Use the entrypoint path inside the image, not /app/entrypoint.sh
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]

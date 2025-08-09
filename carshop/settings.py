@@ -1,12 +1,11 @@
 import os
 from pathlib import Path
-from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-me')
+SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -54,16 +53,8 @@ WSGI_APPLICATION = 'carshop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': config('DB_NAME', default='carshop'),
-        'USER': config('DB_USER', default='sa'),
-        'PASSWORD': config('DB_PASSWORD', default='YourStrong@Passw0rd'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': '1433',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 18 for SQL Server',
-            'extra_params': 'TrustServerCertificate=yes',
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -89,9 +80,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
