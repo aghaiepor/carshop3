@@ -2,13 +2,14 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
-  PIP_NO_CACHE_DIR=1
+  PIP_NO_CACHE_DIR=1 \
+  DEBIAN_FRONTEND=noninteractive
 
-# Base OS deps + build tools for pyodbc + ODBC headers
+# System deps: build tools (for safety), ODBC libs, and pyodbc from apt
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl gnupg ca-certificates apt-transport-https \
   build-essential g++ make python3-dev pkg-config \
-  unixodbc unixodbc-dev \
+  unixodbc unixodbc-dev python3-pyodbc \
   && rm -rf /var/lib/apt/lists/*
 
 # Microsoft ODBC Driver 18 (Debian 12/bookworm) via keyrings
@@ -23,11 +24,12 @@ RUN set -eux; \
 
 WORKDIR /app
 
-# Install Python deps first for better layer caching
+# Upgrade pip tooling and install Python deps
 COPY requirements.txt .
-RUN pip install --prefer-binary -r requirements.txt
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip install --prefer-binary -r requirements.txt
 
-# Entrypoint script
+# Entrypoint script (waits for MSSQL if enabled)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

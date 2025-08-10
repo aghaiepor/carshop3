@@ -5,4 +5,4 @@ crispy-bootstrap5==0.7
 python-decouple==3.8
 django-ckeditor==6.7.1
 mssql-django==1.5.2
-pyodbc==5.1.0
+# NOTE: pyodbc is now installed via apt (python3-pyodbc), not pip
