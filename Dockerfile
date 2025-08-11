@@ -24,8 +24,7 @@ RUN set -eux; \
 # Python deps
 COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r /app/requirements.txt && \
-    pip install --no-cache-dir mssql-django==1.6
+    pip install --no-cache-dir -r /app/requirements.txt
 
 # App files
 COPY . /app
