@@ -6,10 +6,11 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
       - MSSQL_PID=Developer
+      - MSSQL_TCP_PORT=1433
     ports:
       - "${HOST_SQL_PORT:-1433}:1433"
     healthcheck:
-      test: ["CMD-SHELL", "/bin/bash -lc 'echo > /dev/tcp/127.0.0.1/1433'"]
+      test: ["CMD-SHELL", "bash -lc 'echo > /dev/tcp/127.0.0.1/1433'"]
       interval: 5s
       timeout: 3s
       retries: 30
@@ -22,19 +23,21 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: carshop-web
-    command: ["/app/entrypoint.sh"]
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
     depends_on:
       sqlserver:
         condition: service_healthy
     environment:
-      - DEBUG=${DEBUG:-1}
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-please-change-me}
+      # Database
       - DB_ENGINE=${DB_ENGINE:-mssql}
-      - DB_HOST=sqlserver
-      - DB_PORT=1433
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
       - DB_NAME=${DB_NAME:-carshop}
       - DB_USER=${DB_USER:-sa}
-      - DB_PASSWORD=${DB_PASSWORD:-YourStrong!Passw0rd}
+      - DB_PASSWORD=${DB_PASSWORD:-${SA_PASSWORD:-YourStrong!Passw0rd}}
+      # Django
+      - DEBUG=${DEBUG:-1}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-me}
     ports:
       - "${HOST_WEB_PORT:-8000}:8000"
     volumes:
