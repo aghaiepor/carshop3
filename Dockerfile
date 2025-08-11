@@ -4,15 +4,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive
 
-# 1) System deps, ODBC runtime, and pyodbc via apt (avoids compiling wheels)
-# 2) Install Microsoft ODBC Driver 18 using keyrings-based repo config
+# OS deps, ODBC, and pyodbc from apt (avoid compiling wheels)
 RUN set -eux; \
   apt-get update; \
   apt-get install -y --no-install-recommends \
-    curl gnupg ca-certificates apt-transport-https dirmngr \
-    # ODBC runtime + headers and Python bindings from Debian
+    curl gnupg ca-certificates apt-transport-https dirmngr bash \
     unixodbc unixodbc-dev python3-pyodbc \
-    # Pillow runtime libs so it doesn't compile
     libjpeg62-turbo libpng16-16 libfreetype6; \
   mkdir -p /etc/apt/keyrings; \
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg; \
@@ -23,7 +20,7 @@ RUN set -eux; \
 
 WORKDIR /app
 
-# Install Python deps
+# Python deps
 COPY requirements.txt ./
 RUN python -m pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
@@ -33,7 +30,7 @@ COPY scripts/wait_for_mssql_and_init.py /app/scripts/wait_for_mssql_and_init.py
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh && sed -i -e 's/\r$//' /usr/local/bin/entrypoint.sh
 
-# Copy app source
+# App source
 COPY . .
 
 # Static/media folders

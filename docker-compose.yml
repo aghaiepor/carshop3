@@ -3,49 +3,47 @@ version: "3.9"
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: carshop_sqlserver
+    container_name: carshop-mssql
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd#2024}
+      - SA_PASSWORD=${SA_PASSWORD:-Your@StrongP4ssw0rd}
       - MSSQL_PID=Developer
-      - MSSQL_TCP_PORT=1433
     ports:
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql
     healthcheck:
-      # bash TCP open check; waits until port 1433 is accepting connections
-      test: ["CMD-SHELL", "bash -lc '</dev/tcp/127.0.0.1/1433'"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 20s
+      # TCP check without requiring sqlcmd in the image
+      test: ["CMD-SHELL", "bash -lc 'echo > /dev/tcp/127.0.0.1/1433'"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+      start_period: 10s
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: carshop_web
+    container_name: carshop-web
     env_file:
       - .env
     environment:
-      # Defaults if .env missing
+      # Defaults if not in .env
       - DB_ENGINE=${DB_ENGINE:-mssql}
       - DB_HOST=${DB_HOST:-sqlserver}
       - DB_PORT=${DB_PORT:-1433}
       - DB_NAME=${DB_NAME:-carshop}
       - DB_USER=${DB_USER:-sa}
-      - DB_PASSWORD=${DB_PASSWORD:-${SA_PASSWORD:-YourStrong!Passw0rd#2024}}
+      - DB_PASSWORD=${DB_PASSWORD:-Your@StrongP4ssw0rd}
       - DJANGO_DEBUG=${DJANGO_DEBUG:-1}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-secret-key-change-me}
     depends_on:
       sqlserver:
         condition: service_healthy
     ports:
       - "8000:8000"
     volumes:
-      # Mount source for rapid local dev reloads; comment out in production
       - .:/app
+    command: ["/usr/local/bin/entrypoint.sh"]
 
 volumes:
   mssql_data:
