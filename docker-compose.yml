@@ -7,6 +7,7 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
       - MSSQL_PID=Express
+      - MSSQL_TCP_PORT=1433
     ports:
       - "1433:1433"
     volumes:
@@ -18,7 +19,6 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=1
-      # DB config
       - DB_ENGINE=mssql
       - DB_HOST=sqlserver
       - DB_PORT=1433
@@ -29,6 +29,7 @@ services:
       - .:/app
     depends_on:
       - sqlserver
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
 
 volumes:
   mssql_data:
