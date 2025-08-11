@@ -1,6 +1,6 @@
-Django==4.2.7
-Pillow==10.1.0
-django-crispy-forms==2.1
-crispy-bootstrap5==0.7
-python-decouple==3.8
+Django==5.0.6
+mssql-django==1.5.3
+django-crispy-forms==2.2
+crispy-bootstrap5==2024.2
 django-ckeditor==6.7.1
+Pillow==10.3.0
