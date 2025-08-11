@@ -1,12 +1,35 @@
 version: '3.8'
 
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
   web:
     build: .
     ports:
       - "8000:8000"
-    # Bind mount your code; the entrypoint lives in /usr/local/bin so it won't be shadowed
+    environment:
+      # تنظیمات دیتابیس
+      - DB_ENGINE=mssql
+      - DB_HOST=sqlserver
+      - DB_PORT=1433
+      - DB_NAME=carshop
+      - DB_USER=sa
+      - DB_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
+      # Django
+      - DEBUG=1
     volumes:
       - .:/app
-    # IMPORTANT: Use the entrypoint path inside the image, not /app/entrypoint.sh
-    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    depends_on:
+      - sqlserver
+
+volumes:
+  mssql_data:
