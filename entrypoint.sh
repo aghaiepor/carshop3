@@ -20,7 +20,7 @@ user = os.environ.get('DB_USER', 'sa')
 password = os.environ.get('DB_PASSWORD', 'YourStrong!Passw0rd')
 
 conn_str = (
-  "DRIVER={ODBC Driver 18 for SQL Server};"
+  "DRIVER={ODBC Driver 17 for SQL Server};"  # Updated ODBC driver
   f"SERVER={server};UID={user};PWD={password};"
   "TrustServerCertificate=Yes;"
 )

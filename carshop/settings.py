@@ -75,7 +75,7 @@ if USE_MSSQL_ENV and MSSQL_BACKEND_AVAILABLE:
             'HOST': os.environ.get('DB_HOST', 'sqlserver'),
             'PORT': os.environ.get('DB_PORT', '1433'),
             'OPTIONS': {
-                'driver': 'ODBC Driver 18 for SQL Server',
+                'driver': 'ODBC Driver 17 for SQL Server',  # Updated driver string
                 'trustServerCertificate': 'yes',
             },
         }
