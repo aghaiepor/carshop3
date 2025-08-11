@@ -4,46 +4,17 @@ set -x
 
 echo "Starting entrypoint..."
 
+# ساخت مسیرها
 mkdir -p /app/media /app/staticfiles
 
-# If using MSSQL, wait until the DB is ready to accept connections
-if [ "$DB_ENGINE" = "mssql" ]; then
-  echo "Waiting for SQL Server at ${DB_HOST:-sqlserver}:${DB_PORT:-1433} ..."
-  python - << 'PYCODE'
-import os, time, sys
-import pyodbc
-
-host = os.environ.get('DB_HOST', 'sqlserver')
-port = os.environ.get('DB_PORT', '1433')
-server = f"{host},{port}"
-user = os.environ.get('DB_USER', 'sa')
-password = os.environ.get('DB_PASSWORD', 'YourStrong!Passw0rd')
-
-conn_str = (
-  "DRIVER={ODBC Driver 17 for SQL Server};"  # Updated ODBC driver
-  f"SERVER={server};UID={user};PWD={password};"
-  "TrustServerCertificate=Yes;"
-)
-
-for i in range(60):
-  try:
-    with pyodbc.connect(conn_str, timeout=5) as conn:
-      print("SQL Server is reachable.")
-      break
-  except Exception as e:
-    print(f"Waiting for SQL Server... ({i+1}/60): {e}")
-    time.sleep(2)
-else:
-  print("SQL Server not reachable after waiting.", file=sys.stderr)
-  sys.exit(1)
-PYCODE
+# اگر دیتابیس SQL Server است، منتظر آماده شدن و ایجاد DB شو
+if [ "${DB_ENGINE}" = "mssql" ]; then
+  python /app/scripts/wait_for_mssql_and_init.py
 fi
 
-echo "Running migrations..."
-python manage.py migrate --noinput
-
-echo "Collecting static..."
+# مایگریشن و استاتیک
+python manage.py migrate --noinput || (echo "migrate failed" && exit 1)
 python manage.py collectstatic --noinput || true
 
-echo "Starting server..."
+# اجرای سرور
 exec python manage.py runserver 0.0.0.0:8000

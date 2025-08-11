@@ -54,39 +54,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'carshop.wsgi.application'
 
-# Database: prefer MSSQL if requested AND the backend is installed; otherwise fall back to SQLite
-import importlib
-USE_MSSQL_ENV = os.environ.get('DB_ENGINE') == 'mssql'
-MSSQL_BACKEND_AVAILABLE = False
-if USE_MSSQL_ENV:
-    try:
-        importlib.import_module('mssql')
-        MSSQL_BACKEND_AVAILABLE = True
-    except Exception as _e:
-        print(f"WARNING: MSSQL backend not available ({_e}); falling back to SQLite.")
-
-if USE_MSSQL_ENV and MSSQL_BACKEND_AVAILABLE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'mssql',
-            'NAME': os.environ.get('DB_NAME', 'carshop'),
-            'USER': os.environ.get('DB_USER', 'sa'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', 'YourStrong!Passw0rd'),
-            'HOST': os.environ.get('DB_HOST', 'sqlserver'),
-            'PORT': os.environ.get('DB_PORT', '1433'),
-            'OPTIONS': {
-                'driver': 'ODBC Driver 17 for SQL Server',  # Updated driver string
-                'trustServerCertificate': 'yes',
-            },
-        }
+# Database: mssql یا sqlite
+if os.environ.get('DB_ENGINE') == 'mssql':
+  DATABASES = {
+    'default': {
+      'ENGINE': 'mssql',
+      'NAME': os.environ.get('DB_NAME', 'carshop'),
+      'USER': os.environ.get('DB_USER', 'sa'),
+      'PASSWORD': os.environ.get('DB_PASSWORD', 'YourStrong!Passw0rd'),
+      'HOST': os.environ.get('DB_HOST', 'sqlserver'),
+      'PORT': os.environ.get('DB_PORT', '1433'),
+      'OPTIONS': {
+        'driver': 'ODBC Driver 18 for SQL Server',
+        'trustServerCertificate': 'yes',
+      },
     }
+  }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+  DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.sqlite3',
+      'NAME': BASE_DIR / 'db.sqlite3',
     }
+  }
 
 AUTH_PASSWORD_VALIDATORS = [
   {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
