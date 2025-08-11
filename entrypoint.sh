@@ -1,22 +1,28 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Starting entrypoint..."
+# Default envs for safety
+export DB_ENGINE="${DB_ENGINE:-sqlite}"
+export DB_HOST="${DB_HOST:-sqlserver}"
+export DB_PORT="${DB_PORT:-1433}"
+export DB_NAME="${DB_NAME:-carshop}"
+export DB_USER="${DB_USER:-sa}"
+export DB_PASSWORD="${DB_PASSWORD:-${SA_PASSWORD:-YourStrong!Passw0rd#2024}}"
+export DJANGO_DEBUG="${DJANGO_DEBUG:-1}"
 
-# Ensure dirs exist
-mkdir -p /app/media /app/staticfiles
-
-# If using MSSQL, wait for it and ensure DB exists
+# Wait for MSSQL and create DB if needed
 if [ "${DB_ENGINE}" = "mssql" ]; then
-  echo "Waiting for SQL Server and ensuring database exists..."
+  echo "[entrypoint] Waiting for SQL Server at ${DB_HOST}:${DB_PORT} ..."
   python /app/scripts/wait_for_mssql_and_init.py
+else
+  echo "[entrypoint] Using SQLite (no DB wait)."
 fi
 
-echo "Running migrations..."
+echo "[entrypoint] Running migrations..."
 python manage.py migrate --noinput
 
-echo "Collecting static..."
-python manage.py collectstatic --noinput || true
+echo "[entrypoint] Collecting static..."
+python manage.py collectstatic --noinput
 
-echo "Starting server..."
+echo "[entrypoint] Starting Django dev server on 0.0.0.0:8000"
 exec python manage.py runserver 0.0.0.0:8000

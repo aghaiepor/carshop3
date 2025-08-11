@@ -5,6 +5,62 @@ from typing import Optional
 
 import pyodbc
 
+HOST = os.environ.get("DB_HOST", "sqlserver")
+PORT = os.environ.get("DB_PORT", "1433")
+USER = os.environ.get("DB_USER", "sa")
+PASSWORD = os.environ.get("DB_PASSWORD", "YourStrong!Passw0rd#2024")
+DB_NAME = os.environ.get("DB_NAME", "carshop")
+
+MASTER_CS = (
+    "DRIVER={ODBC Driver 18 for SQL Server};"
+    f"SERVER={HOST},{PORT};"
+    f"UID={USER};PWD={PASSWORD};"
+    "Encrypt=yes;TrustServerCertificate=yes;"
+    "DATABASE=master"
+)
+
+TARGET_CS = (
+    "DRIVER={ODBC Driver 18 for SQL Server};"
+    f"SERVER={HOST},{PORT};"
+    f"UID={USER};PWD={PASSWORD};"
+    "Encrypt=yes;TrustServerCertificate=yes;"
+    f"DATABASE={DB_NAME}"
+)
+
+def wait_for_port():
+    while True:
+        try:
+            with pyodbc.connect(MASTER_CS, timeout=5) as conn:
+                return
+        except Exception as e:
+            print(f"[wait_for_mssql] SQL not ready yet: {e}")
+            time.sleep(2)
+
+def ensure_database():
+    with pyodbc.connect(MASTER_CS, timeout=10, autocommit=True) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM sys.databases WHERE name = ?", DB_NAME)
+        row = cur.fetchone()
+        if row:
+            print(f"[wait_for_mssql] Database '{DB_NAME}' already exists.")
+            return
+        print(f"[wait_for_mssql] Creating database '{DB_NAME}' ...")
+        cur.execute(f"CREATE DATABASE [{DB_NAME}]")
+        print(f"[wait_for_mssql] Created database '{DB_NAME}'.")
+
+def check_target_db():
+    for _ in range(10):
+        try:
+            with pyodbc.connect(TARGET_CS, timeout=5) as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT 1")
+                cur.fetchone()
+                print(f"[wait_for_mssql] Connected to '{DB_NAME}'.")
+                return True
+        except Exception as e:
+            print(f"[wait_for_mssql] Waiting for '{DB_NAME}' to be ready: {e}")
+            time.sleep(2)
+    return False
 
 def get_env(name: str, default: Optional[str] = None) -> str:
     v = os.environ.get(name, default)
@@ -12,7 +68,6 @@ def get_env(name: str, default: Optional[str] = None) -> str:
         print(f"Missing required env var: {name}", file=sys.stderr)
         sys.exit(1)
     return v
-
 
 def connect(server: str, database: Optional[str], user: str, password: str, timeout: int = 3):
     db_part = f";DATABASE={database}" if database else ""
@@ -25,7 +80,6 @@ def connect(server: str, database: Optional[str], user: str, password: str, time
         f"{db_part};"
     )
     return pyodbc.connect(conn_str)
-
 
 def main():
     host = get_env("DB_HOST", "sqlserver")
@@ -73,6 +127,10 @@ def main():
         print(f"Smoke test failed: {e}", file=sys.stderr)
         sys.exit(1)
 
-
 if __name__ == "__main__":
-    main()
+    print(f"[wait_for_mssql] Waiting for TCP and login to {HOST}:{PORT} ...")
+    wait_for_port()
+    ensure_database()
+    ok = check_target_db()
+    if not ok:
+        raise SystemExit("[wait_for_mssql] Could not connect to target DB after creation.")

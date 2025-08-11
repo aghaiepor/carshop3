@@ -1,44 +1,51 @@
-version: '3.8'
+version: "3.9"
 
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: carshop-mssql
+    container_name: carshop_sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
-      - MSSQL_PID=Express
+      - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd#2024}
+      - MSSQL_PID=Developer
+      - MSSQL_TCP_PORT=1433
     ports:
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/1433' || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 30
+      # bash TCP open check; waits until port 1433 is accepting connections
+      test: ["CMD-SHELL", "bash -lc '</dev/tcp/127.0.0.1/1433'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
       start_period: 20s
 
   web:
-    build: .
-    container_name: carshop-web
-    ports:
-      - "8000:8000"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carshop_web
+    env_file:
+      - .env
     environment:
-      # Database
-      - DB_ENGINE=mssql
-      - DB_HOST=sqlserver
-      - DB_PORT=1433
-      - DB_NAME=carshop
-      - DB_USER=sa
-      - DB_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd}
-      # Django
-      - DEBUG=1
-    volumes:
-      - .:/app
+      # Defaults if .env missing
+      - DB_ENGINE=${DB_ENGINE:-mssql}
+      - DB_HOST=${DB_HOST:-sqlserver}
+      - DB_PORT=${DB_PORT:-1433}
+      - DB_NAME=${DB_NAME:-carshop}
+      - DB_USER=${DB_USER:-sa}
+      - DB_PASSWORD=${DB_PASSWORD:-${SA_PASSWORD:-YourStrong!Passw0rd#2024}}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-1}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-secret-key-change-me}
     depends_on:
       sqlserver:
         condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source for rapid local dev reloads; comment out in production
+      - .:/app
 
 volumes:
   mssql_data:
