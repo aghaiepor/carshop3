@@ -1,64 +1,68 @@
 import os
-import time
 import sys
-from typing import Optional
+import time
 
 import pyodbc
 
 DB_HOST = os.getenv("DB_HOST", "sqlserver")
 DB_PORT = os.getenv("DB_PORT", "1433")
-DB_USER = os.getenv("DB_USER", "sa")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "Your@StrongP4ssw0rd")
 DB_NAME = os.getenv("DB_NAME", "carshop")
+DB_USER = os.getenv("DB_USER", "sa")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "YourStrong!Passw0rd")
+ODBC_DRIVER = os.getenv("ODBC_DRIVER", "ODBC Driver 18 for SQL Server")
 
-DRIVER = "ODBC Driver 18 for SQL Server"
-TRUST = "Yes"
+SERVER = f"{DB_HOST},{DB_PORT}"
+BASE_PARAMS = "TrustServerCertificate=Yes;Encrypt=Yes"
 
-def conn_str(database: Optional[str] = None) -> str:
-    server = f"{DB_HOST},{DB_PORT}"
-    parts = [
-        f"DRIVER={{{{}}}}".format(DRIVER),
-        f"SERVER={server}",
-        f"UID={DB_USER}",
-        f"PWD={DB_PASSWORD}",
-        f"TrustServerCertificate={TRUST}",
-        "Encrypt=no",
-        "Connection Timeout=5",
-    ]
-    if database:
-        parts.append(f"DATABASE={database}")
-    return ";".join(parts)
+def connect(database=None, timeout=5):
+    db_part = f";DATABASE={database}" if database else ""
+    conn_str = f"DRIVER={{{{ {ODBC_DRIVER} }}}};SERVER={SERVER};UID={DB_USER};PWD={DB_PASSWORD};{BASE_PARAMS}{db_part}"
+    return pyodbc.connect(conn_str, timeout=timeout)
 
-def wait_for_server(timeout_seconds: int = 120) -> None:
-    deadline = time.time() + timeout_seconds
-    last_err = None
-    while time.time() < deadline:
+def wait_for_tcp(max_attempts=60, delay=1.0):
+    for attempt in range(1, max_attempts + 1):
         try:
-            with pyodbc.connect(conn_str("master")) as _:
-                print("[wait] SQL Server is accepting connections.")
+            with connect(timeout=3) as _:
+                print(f"[wait] SQL Server reachable (attempt {attempt})")
                 return
         except Exception as e:
-            last_err = e
-            print(f"[wait] SQL not ready yet: {e}")
-            time.sleep(2)
-    print("[wait] Timeout waiting for SQL Server.", file=sys.stderr)
-    if last_err:
-        print(f"Last error: {last_err}", file=sys.stderr)
+            print(f"[wait] SQL not ready (attempt {attempt}/{max_attempts}): {e}")
+            time.sleep(delay)
+    print("[wait] SQL Server did not become ready in time.", file=sys.stderr)
     sys.exit(1)
 
-def ensure_database() -> None:
-    with pyodbc.connect(conn_str("master"), autocommit=True) as cxn:
-        cur = cxn.cursor()
-        cur.execute("SELECT name FROM sys.databases WHERE name = ?", DB_NAME)
+def ensure_database():
+    # Connect to master to check/create the DB
+    with connect(database="master") as conn:
+        conn.autocommit = True
+        cur = conn.cursor()
+        cur.execute("SELECT DB_ID(?)", DB_NAME)
         row = cur.fetchone()
-        if row:
-            print(f"[init] Database '{DB_NAME}' already exists.")
-            return
-        print(f"[init] Creating database '{DB_NAME}'...")
-        cur.execute(f"CREATE DATABASE [{DB_NAME}]")
-        print(f"[init] Database '{DB_NAME}' created.")
+        if not row or row[0] is None:
+            print(f"[wait] Creating database [{DB_NAME}] ...")
+            cur.execute(f"CREATE DATABASE [{DB_NAME}]")
+            # Wait a moment for the DB to come online
+            time.sleep(2.0)
+        else:
+            print(f"[wait] Database [{DB_NAME}] already exists.")
+
+    # Verify we can connect to the target DB
+    for attempt in range(1, 30):
+        try:
+            with connect(database=DB_NAME, timeout=3) as _:
+                print(f"[wait] Verified connection to DB [{DB_NAME}]")
+                return
+        except Exception as e:
+            print(f"[wait] DB connect not ready (attempt {attempt}/30): {e}")
+            time.sleep(1.0)
+    print(f"[wait] Could not connect to DB [{DB_NAME}] after creation.", file=sys.stderr)
+    sys.exit(2)
+
+def main():
+    print(f"[wait] Using driver: {ODBC_DRIVER}")
+    print(f"[wait] Target server: {SERVER}, DB: {DB_NAME}")
+    wait_for_tcp()
+    ensure_database()
 
 if __name__ == "__main__":
-    print(f"[wait] Target server {DB_HOST}:{DB_PORT}, database '{DB_NAME}'")
-    wait_for_server()
-    ensure_database()
+    main()
