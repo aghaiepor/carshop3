@@ -4,17 +4,17 @@ set -x
 
 echo "Starting entrypoint..."
 
-# ساخت مسیرها
+# Ensure dirs exist
 mkdir -p /app/media /app/staticfiles
 
-# اگر دیتابیس SQL Server است، منتظر آماده شدن و ایجاد DB شو
-if [ "${DB_ENGINE}" = "mssql" ]; then
-  python /app/scripts/wait_for_mssql_and_init.py
-fi
+echo "Making migrations (if needed)..."
+python manage.py makemigrations cars
 
-# مایگریشن و استاتیک
-python manage.py migrate --noinput || (echo "migrate failed" && exit 1)
-python manage.py collectstatic --noinput || true
+echo "Running migrations..."
+python manage.py migrate --noinput
 
-# اجرای سرور
+echo "Collecting static..."
+python manage.py collectstatic --noinput
+
+echo "Starting server..."
 exec python manage.py runserver 0.0.0.0:8000
