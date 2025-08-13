@@ -1,49 +1,117 @@
 import os
 from pathlib import Path
 
-# Base dir (fallback if not defined earlier)
-try:
-    BASE_DIR
-except NameError:
-    BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-def env(name: str, default: str | None = None) -> str | None:
-    return os.environ.get(name, default)
+SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
+DEBUG = True
+ALLOWED_HOSTS = ['*']
 
-DB_ENGINE = env("DB_ENGINE", "sqlite")
+INSTALLED_APPS = [
+  'django.contrib.admin',
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.sessions',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
+  'crispy_forms',
+  'crispy_bootstrap5',
+  'cars',
+  'ckeditor',
+  'ckeditor_uploader',
+]
 
-if DB_ENGINE == "mssql":
-    # Try to use mssql-django backend if installed; otherwise fall back to SQLite
-    try:
-        import mssql  # noqa: F401
+MIDDLEWARE = [
+  'django.middleware.security.SecurityMiddleware',
+  'django.contrib.sessions.middleware.SessionMiddleware',
+  'django.middleware.locale.LocaleMiddleware',
+  'django.middleware.common.CommonMiddleware',
+  'django.middleware.csrf.CsrfViewMiddleware',
+  'django.contrib.auth.middleware.AuthenticationMiddleware',
+  'django.contrib.messages.middleware.MessageMiddleware',
+  'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
-        DATABASES = {
-            "default": {
-                "ENGINE": "mssql",
-                "NAME": env("DB_NAME", "carshop"),
-                "USER": env("DB_USER", "sa"),
-                "PASSWORD": env("DB_PASSWORD", ""),
-                "HOST": env("DB_HOST", "sqlserver"),
-                "PORT": env("DB_PORT", "1433"),
-                "OPTIONS": {
-                    "driver": env("ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
-                    "TrustServerCertificate": "yes",
-                },
-            }
-        }
-    except Exception as e:
-        print(f"[settings] MSSQL backend unavailable ({e!r}). Falling back to SQLite.")
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": str(BASE_DIR / "db.sqlite3"),
-            }
-        }
-else:
-    # Default SQLite database
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": str(BASE_DIR / "db.sqlite3"),
-        }
-    }
+ROOT_URLCONF = 'carshop.urls'
+
+TEMPLATES = [
+  {
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [BASE_DIR / 'templates'],
+    'APP_DIRS': True,
+    'OPTIONS': {
+      'context_processors': [
+        'django.template.context_processors.debug',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+        'django.template.context_processors.i18n',
+        'cars.context_processors.site_settings',
+      ],
+    },
+  },
+]
+
+WSGI_APPLICATION = 'carshop.wsgi.application'
+
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': BASE_DIR / 'db.sqlite3',
+  }
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+  {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+  {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+  {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+  {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+LANGUAGE_CODE = 'fa'
+LANGUAGES = [
+  ('fa', 'Persian'),
+  ('en', 'English'),
+]
+LOCALE_PATHS = [BASE_DIR / 'locale']
+TIME_ZONE = 'Asia/Tehran'
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Crispy Forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# CKEditor
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
+  "default": {
+    "skin": "moono-lisa",
+    "toolbar": "Custom",
+    "toolbar_Custom": [
+      ["Format", "Bold", "Italic", "Underline", "Strike"],
+      ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote"],
+      ["JustifyRight", "JustifyCenter", "JustifyLeft", "JustifyBlock"],
+      ["Link", "Unlink", "Image", "Table"],
+      ["TextColor", "BGColor", "RemoveFormat"],
+      ["Source"],
+    ],
+    "height": 300,
+    "language": "fa",
+    "contentsLanguage": "fa",
+    "contentsLangDirection": "rtl",
+    "extraPlugins": "uploadimage,justify,colorbutton",
+    "removeDialogTabs": "image:advanced;image:Link",
+    "format_tags": "p;h2;h3;pre",
+    "width": "auto",
+  }
+}

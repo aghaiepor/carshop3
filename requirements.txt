@@ -1,14 +1,6 @@
-# Django and database backend
-Django==4.2.13
-mssql-django==1.6
-
-# Forms and UI helpers
-django-crispy-forms==2.3
-crispy-bootstrap5==2024.2
-
-# CKEditor and image processing
+Django==4.2.7
+Pillow==10.1.0
+django-crispy-forms==2.1
+crispy-bootstrap5==0.7
+python-decouple==3.8
 django-ckeditor==6.7.1
-Pillow==10.3.0
-
-# Optional: useful runtime tools (safe pins)
-python-dotenv==1.0.1
