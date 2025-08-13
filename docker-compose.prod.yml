@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:8000"
+    volumes:
+      - ./media:/app/media
+      - ./staticfiles:/app/staticfiles
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=your-production-secret-key-here-make-it-very-long-and-random
+      - ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,localhost
+    entrypoint: ["/usr/local/bin/entrypoint.sh"]
+    restart: unless-stopped

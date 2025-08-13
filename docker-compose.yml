@@ -4,7 +4,10 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "80:8000"
     volumes:
       - .:/app
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=*
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
