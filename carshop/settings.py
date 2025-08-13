@@ -6,8 +6,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-secret-key-here-change-in-production')
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Allow all hosts for production - you should specify your domain in production
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+# Fix ALLOWED_HOSTS for localhost and any domain
+ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', '')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
+else:
+    ALLOWED_HOSTS = ['*']  # Allow all hosts in development
+
+# Add localhost variations
+ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '0.0.0.0'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -118,8 +125,12 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-# Security settings for production
-if not DEBUG:
+# Security settings - relaxed for development
+if DEBUG:
+    # Development settings
+    CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://0.0.0.0']
+else:
+    # Production security settings
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'

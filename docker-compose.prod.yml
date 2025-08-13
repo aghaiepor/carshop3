@@ -9,8 +9,8 @@ services:
       - ./media:/app/media
       - ./staticfiles:/app/staticfiles
     environment:
-      - DEBUG=False
-      - SECRET_KEY=your-production-secret-key-here-make-it-very-long-and-random
-      - ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,localhost
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-dev-key-for-testing-only
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
     restart: unless-stopped
