@@ -4,17 +4,14 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-secret-key-here-change-in-production')
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# Fix ALLOWED_HOSTS for localhost and any domain
+# ALLOWED_HOSTS for your domain
 ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', '')
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
 else:
-    ALLOWED_HOSTS = ['*']  # Allow all hosts in development
-
-# Add localhost variations
-ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '0.0.0.0'])
+    ALLOWED_HOSTS = ['bibonbast.ir', 'www.bibonbast.ir']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -125,15 +122,23 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-# Security settings - relaxed for development
-if DEBUG:
-    # Development settings
-    CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'http://0.0.0.0']
-else:
-    # Production security settings
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+# CSRF and security settings (flexible for both HTTP/HTTPS)
+CSRF_TRUSTED_ORIGINS = [
+    'https://bibonbast.ir',
+    'https://www.bibonbast.ir',
+    'http://bibonbast.ir',
+    'http://www.bibonbast.ir',
+]
+
+# Security settings (relaxed to work with both HTTP and HTTPS)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # Don't force HTTPS redirect
+SESSION_COOKIE_SECURE = False  # Allow cookies over HTTP
+CSRF_COOKIE_SECURE = False  # Allow CSRF cookies over HTTP
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # Less restrictive
+
+# Trust proxy headers
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
