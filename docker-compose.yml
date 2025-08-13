@@ -1,10 +1,10 @@
+version: '3.8'
+
 services:
   web:
     build: .
     ports:
       - "8000:8000"
-    # Bind mount your code; the entrypoint lives in /usr/local/bin so it won't be shadowed
     volumes:
       - .:/app
-    # IMPORTANT: Use the entrypoint path inside the image, not /app/entrypoint.sh
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
