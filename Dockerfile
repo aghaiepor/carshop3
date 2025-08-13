@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install entrypoint into image and ensure it's executable
+# Install entrypoint into image and ensure it’s executable
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh \
   && sed -i -e 's/\r$//' /usr/local/bin/entrypoint.sh
