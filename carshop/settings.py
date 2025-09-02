@@ -11,7 +11,7 @@ ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', '')
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
 else:
-    ALLOWED_HOSTS = ['192.3.154.52', 'localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['82.152.98.211', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -23,8 +23,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'cars',
-    'ckeditor',
-    'ckeditor_uploader',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -96,36 +95,66 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# CKEditor
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_IMAGE_BACKEND = "pillow"
-CKEDITOR_CONFIGS = {
-    "default": {
-        "skin": "moono-lisa",
-        "toolbar": "Custom",
-        "toolbar_Custom": [
-            ["Format", "Bold", "Italic", "Underline", "Strike"],
-            ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote"],
-            ["JustifyRight", "JustifyCenter", "JustifyLeft", "JustifyBlock"],
-            ["Link", "Unlink", "Image", "Table"],
-            ["TextColor", "BGColor", "RemoveFormat"],
-            ["Source"],
+# CKEditor 5 Configuration (secure version)
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+        'language': 'fa',
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
         ],
-        "height": 300,
-        "language": "fa",
-        "contentsLanguage": "fa",
-        "contentsLangDirection": "rtl",
-        "extraPlugins": "uploadimage,justify,colorbutton",
-        "removeDialogTabs": "image:advanced;image:Link",
-        "format_tags": "p;h2;h3;pre",
-        "width": "auto",
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                    'insertTable',],
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  ],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+        },
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+        },
+        'heading' : {
+            'options': [
+                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+            ]
+        }
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
     }
 }
 
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+CKEDITOR_5_UPLOAD_PATH = "uploads/"
+
 # CSRF and security settings for HTTPS
 CSRF_TRUSTED_ORIGINS = [
-    'https://192.3.154.52',
-    'http://192.3.154.52',
+    'https://82.152.98.211',
+    'http://82.152.98.211',
     'https://localhost',
     'http://localhost',
 ]

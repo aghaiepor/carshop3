@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Generating self-signed SSL certificate for 192.3.154.52..."
+echo "Generating self-signed SSL certificate for 82.152.98.211..."
 
 # Create SSL directory
 mkdir -p ssl
@@ -9,7 +9,7 @@ mkdir -p ssl
 openssl genrsa -out ssl/server.key 2048
 
 # Generate certificate signing request
-openssl req -new -key ssl/server.key -out ssl/server.csr -subj "/C=US/ST=State/L=City/O=Organization/CN=192.3.154.52"
+openssl req -new -key ssl/server.key -out ssl/server.csr -subj "/C=US/ST=State/L=City/O=Organization/CN=82.152.98.211"
 
 # Generate self-signed certificate
 openssl x509 -req -days 365 -in ssl/server.csr -signkey ssl/server.key -out ssl/server.crt

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django import forms
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 from .models import Brand, Category, Car, CarImage, Inquiry, SiteSettings, Slider, Slide
 
@@ -10,8 +10,8 @@ class CarImageInline(admin.TabularInline):
     extra = 1
 
 class SiteSettingsForm(forms.ModelForm):
-    header_html = forms.CharField(label="HTML هدر (اختیاری)", required=False, widget=CKEditorUploadingWidget())
-    footer_html = forms.CharField(label="HTML پاورقی", required=False, widget=CKEditorUploadingWidget())
+    header_html = forms.CharField(label="HTML هدر (اختیاری)", required=False, widget=CKEditor5Widget(config_name='extends'))
+    footer_html = forms.CharField(label="HTML پاورقی", required=False, widget=CKEditor5Widget(config_name='extends'))
 
     class Meta:
         model = SiteSettings

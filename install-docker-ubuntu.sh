@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Installing Docker and Docker Compose on Ubuntu Server..."
+echo "🐳 Installing Docker and Docker Compose on Ubuntu Server..."
 
 # Update package index
 sudo apt update
@@ -31,6 +31,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo systemctl start docker
 sudo systemctl enable docker
 
-echo "Docker installation complete!"
-echo "Please log out and log back in for group changes to take effect."
-echo "Then run: ./deploy-ubuntu-server.sh"
+echo "✅ Docker installation complete!"
+echo "⚠️  Please log out and log back in for group changes to take effect."
+echo "Or run: newgrp docker"
+echo ""
+echo "🚀 Then run: ./deploy-server-82.sh"
