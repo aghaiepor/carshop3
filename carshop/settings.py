@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', '1') == '1'
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -54,12 +54,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'carshop.wsgi.application'
 
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': BASE_DIR / 'db.sqlite3',
+# Database: mssql یا sqlite
+if os.environ.get('DB_ENGINE') == 'mssql':
+  DATABASES = {
+    'default': {
+      'ENGINE': 'mssql',
+      'NAME': os.environ.get('DB_NAME', 'carshop'),
+      'USER': os.environ.get('DB_USER', 'sa'),
+      'PASSWORD': os.environ.get('DB_PASSWORD', 'YourStrong!Passw0rd'),
+      'HOST': os.environ.get('DB_HOST', 'sqlserver'),
+      'PORT': os.environ.get('DB_PORT', '1433'),
+      'OPTIONS': {
+        'driver': 'ODBC Driver 18 for SQL Server',
+        'trustServerCertificate': 'yes',
+      },
+    }
   }
-}
+else:
+  DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.sqlite3',
+      'NAME': BASE_DIR / 'db.sqlite3',
+    }
+  }
 
 AUTH_PASSWORD_VALIDATORS = [
   {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -86,11 +103,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# CKEditor
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_CONFIGS = {
