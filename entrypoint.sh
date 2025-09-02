@@ -1,20 +1,32 @@
 #!/bin/sh
 set -e
-set -x
 
-echo "Starting entrypoint..."
+echo "🚀 Starting Django Car Shop..."
 
-# ساخت مسیرها
+# Create necessary directories
 mkdir -p /app/media /app/staticfiles
 
-# اگر دیتابیس SQL Server است، منتظر آماده شدن و ایجاد DB شو
-if [ "${DB_ENGINE}" = "mssql" ]; then
-  python /app/scripts/wait_for_mssql_and_init.py
-fi
+# Wait a moment for any dependencies
+sleep 2
 
-# مایگریشن و استاتیک
-python manage.py migrate --noinput || (echo "migrate failed" && exit 1)
-python manage.py collectstatic --noinput || true
+echo "📦 Making migrations..."
+python manage.py makemigrations cars --noinput || true
 
-# اجرای سرور
+echo "🔄 Running migrations..."
+python manage.py migrate --noinput
+
+echo "📁 Collecting static files..."
+python manage.py collectstatic --noinput --clear
+
+echo "👤 Creating superuser if needed..."
+python manage.py shell << EOF
+from django.contrib.auth.models import User
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+    print('Superuser created: admin/admin123')
+else:
+    print('Superuser already exists')
+EOF
+
+echo "🌟 Starting Django development server..."
 exec python manage.py runserver 0.0.0.0:8000
