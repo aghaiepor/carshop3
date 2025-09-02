@@ -11,7 +11,7 @@ services:
     environment:
       - DEBUG=False
       - SECRET_KEY=django-insecure-change-this-in-production-make-it-very-long-and-random-key-for-security
-      - ALLOWED_HOSTS=192.3.154.52,localhost
+      - ALLOWED_HOSTS=82.152.98.211,localhost
     entrypoint: ["/usr/local/bin/entrypoint.sh"]
     restart: unless-stopped
     networks:

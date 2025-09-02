@@ -11,7 +11,7 @@ ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS', '')
 if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
 else:
-    ALLOWED_HOSTS = ['192.3.154.52', 'localhost', '127.0.0.1', '*']
+    ALLOWED_HOSTS = ['82.152.98.211', 'localhost', '127.0.0.1', '*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -95,7 +95,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# CKEditor 5 Configuration
+# CKEditor 5 Configuration (replaces old CKEditor 4)
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
@@ -129,14 +129,6 @@ CKEDITOR_5_CONFIGS = {
         'table': {
             'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
             'tableProperties', 'tableCellProperties' ],
-            'tableProperties': {
-                'borderColors': customColorPalette,
-                'backgroundColors': customColorPalette
-            },
-            'tableCellProperties': {
-                'borderColors': customColorPalette,
-                'backgroundColors': customColorPalette
-            }
         },
         'heading' : {
             'options': [
@@ -156,40 +148,13 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
-customColorPalette = [
-    {
-        'color': 'hsl(4, 90%, 58%)',
-        'label': 'Red'
-    },
-    {
-        'color': 'hsl(340, 82%, 52%)',
-        'label': 'Pink'
-    },
-    {
-        'color': 'hsl(291, 64%, 42%)',
-        'label': 'Purple'
-    },
-    {
-        'color': 'hsl(262, 52%, 47%)',
-        'label': 'Deep Purple'
-    },
-    {
-        'color': 'hsl(231, 48%, 48%)',
-        'label': 'Indigo'
-    },
-    {
-        'color': 'hsl(207, 90%, 54%)',
-        'label': 'Blue'
-    },
-]
-
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 CKEDITOR_5_UPLOAD_PATH = "uploads/"
 
 # CSRF and security settings for HTTPS
 CSRF_TRUSTED_ORIGINS = [
-    'https://192.3.154.52',
-    'http://192.3.154.52',
+    'https://82.152.98.211',
+    'http://82.152.98.211',
     'https://localhost',
     'http://localhost',
 ]
