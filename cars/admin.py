@@ -1,21 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django import forms
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
-
-from .models import Brand, Category, Car, CarImage, Inquiry, SiteSettings, Slider, Slide
+from .models import Brand, Category, Car, CarImage, Inquiry, SiteSettings
 
 class CarImageInline(admin.TabularInline):
     model = CarImage
     extra = 1
-
-class SiteSettingsForm(forms.ModelForm):
-    header_html = forms.CharField(label="HTML هدر (اختیاری)", required=False, widget=CKEditorUploadingWidget())
-    footer_html = forms.CharField(label="HTML پاورقی", required=False, widget=CKEditorUploadingWidget())
-
-    class Meta:
-        model = SiteSettings
-        fields = "__all__"
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -63,32 +52,22 @@ class InquiryAdmin(admin.ModelAdmin):
     list_editable = ['is_read']
     readonly_fields = ['created_at']
 
-class SlideInline(admin.TabularInline):
-    model = Slide
-    extra = 1
-    fields = ('order', 'image', 'title', 'subtitle', 'button_label', 'button_url', 'is_active', 'start_at', 'end_at')
-    ordering = ('order',)
-
-@admin.register(Slider)
-class SliderAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'is_enabled', 'autoplay', 'autoplay_interval_ms', 'pause_on_hover', 'wrap', 'show_indicators', 'show_controls', 'updated_at')
-    list_editable = ('is_enabled', 'autoplay', 'autoplay_interval_ms', 'pause_on_hover', 'wrap', 'show_indicators', 'show_controls')
-    fieldsets = (
-        ("تنظیمات پخش", {'fields': ('is_enabled', 'autoplay', 'autoplay_interval_ms', 'pause_on_hover', 'wrap')}),
-        ("نمایش", {'fields': ('show_indicators', 'show_controls')}),
-    )
-    inlines = [SlideInline]
-
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    form = SiteSettingsForm
     fieldsets = (
-        ("سرتیتر", {'fields': ('site_name', 'logo', 'primary_color', 'secondary_color', 'header_html')}),
-        ("بخش هرو (صفحه اصلی)", {'fields': ('hero_title', 'hero_subtitle', 'hero_cta_label', 'hero_cta_url')}),
-        ("پاورقی و تماس", {'fields': ('contact_phone', 'contact_email', 'contact_address', 'footer_html')}),
+        ("سرتیتر", {
+            'fields': ('site_name', 'logo', 'primary_color', 'secondary_color', 'header_html')
+        }),
+        ("بخش هرو (صفحه اصلی)", {
+            'fields': ('hero_title', 'hero_subtitle', 'hero_cta_label', 'hero_cta_url')
+        }),
+        ("پاورقی و تماس", {
+            'fields': ('contact_phone', 'contact_email', 'contact_address', 'footer_html')
+        }),
     )
 
     def has_add_permission(self, request):
+        # Limit to a single instance
         if SiteSettings.objects.exists():
             return False
         return super().has_add_permission(request)

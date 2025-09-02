@@ -1,13 +1,17 @@
 {% extends "admin/base.html" %}
 {% load i18n static %}
+
 {% block title %}{% trans "پنل مدیریت فروشگاه خودرو" %}{% endblock %}
+
 {% block extrastyle %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/css/custom-admin.css' %}">
 {% endblock %}
+
 {% block branding %}
   <h1 id="site-name">
     <a href="{% url 'admin:index' %}">{% trans "پنل مدیریت فروشگاه خودرو" %}</a>
   </h1>
 {% endblock %}
+
 {% block nav-global %}{% endblock %}

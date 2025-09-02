@@ -1,32 +1,20 @@
 #!/bin/sh
 set -e
+set -x
 
-echo "🚀 Starting Django Car Shop..."
+echo "Starting entrypoint..."
 
-# Create necessary directories
+# Ensure dirs exist
 mkdir -p /app/media /app/staticfiles
 
-# Wait a moment for any dependencies
-sleep 2
+echo "Making migrations (if needed)..."
+python manage.py makemigrations cars
 
-echo "📦 Making migrations..."
-python manage.py makemigrations cars --noinput || true
-
-echo "🔄 Running migrations..."
+echo "Running migrations..."
 python manage.py migrate --noinput
 
-echo "📁 Collecting static files..."
-python manage.py collectstatic --noinput --clear
+echo "Collecting static..."
+python manage.py collectstatic --noinput
 
-echo "👤 Creating superuser if needed..."
-python manage.py shell << EOF
-from django.contrib.auth.models import User
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('Superuser created: admin/admin123')
-else:
-    print('Superuser already exists')
-EOF
-
-echo "🌟 Starting Django development server..."
+echo "Starting server..."
 exec python manage.py runserver 0.0.0.0:8000

@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 class Brand(models.Model):
@@ -17,7 +16,6 @@ class Brand(models.Model):
         verbose_name = _("برند")
         verbose_name_plural = _("برندها")
 
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -31,7 +29,6 @@ class Category(models.Model):
         verbose_name_plural = _("دسته‌بندی‌ها")
         ordering = ['name']
 
-
 class Car(models.Model):
     FUEL_CHOICES = [
         ('petrol', 'Petrol'),
@@ -39,11 +36,13 @@ class Car(models.Model):
         ('electric', 'Electric'),
         ('hybrid', 'Hybrid'),
     ]
+    
     TRANSMISSION_CHOICES = [
         ('manual', 'Manual'),
         ('automatic', 'Automatic'),
         ('cvt', 'CVT'),
     ]
+    
     STATUS_CHOICES = [
         ('available', 'Available'),
         ('sold', 'Sold'),
@@ -79,7 +78,6 @@ class Car(models.Model):
         verbose_name = _("خودرو")
         verbose_name_plural = _("خودروها")
 
-
 class CarImage(models.Model):
     car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='cars/')
@@ -93,7 +91,6 @@ class CarImage(models.Model):
         ordering = ['-is_primary', 'created_at']
         verbose_name = _("تصویر خودرو")
         verbose_name_plural = _("تصاویر خودرو")
-
 
 class Inquiry(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
@@ -114,20 +111,26 @@ class Inquiry(models.Model):
 
 
 class SiteSettings(models.Model):
+    # Header
     site_name = models.CharField(max_length=150, default="فروشگاه خودرو")
     logo = models.ImageField(upload_to='site/', blank=True, null=True)
+    # Colors (optional)
     primary_color = models.CharField(max_length=20, blank=True, default="#0ea5e9")
     secondary_color = models.CharField(max_length=20, blank=True, default="#10b981")
 
+    # Hero section
     hero_title = models.CharField(max_length=200, default="خودروی مورد نظرت را پیدا کن")
     hero_subtitle = models.CharField(max_length=300, blank=True, default="مجموعه‌ای گسترده از خودروهای باکیفیت با قیمت‌های رقابتی")
     hero_cta_label = models.CharField(max_length=80, default="مشاهده خودروها")
     hero_cta_url = models.CharField(max_length=200, default="/cars/")
 
+    # Footer and contact
     contact_phone = models.CharField(max_length=50, blank=True, default="+98 21 1234 5678")
     contact_email = models.EmailField(blank=True, default="info@carshop.test")
     contact_address = models.CharField(max_length=200, blank=True, default="تهران، خیابان خودرو، پلاک ۱۲۳")
     footer_html = models.TextField(blank=True, default="© ۱۴۰۳ فروشگاه خودرو. کلیه حقوق محفوظ است.")
+
+    # Extra HTML (optional)
     header_html = models.TextField(blank=True, default="")
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -145,61 +148,3 @@ class SiteSettings(models.Model):
         if not obj:
             obj = SiteSettings.objects.create()
         return obj
-
-
-class Slider(models.Model):
-    is_enabled = models.BooleanField(default=True, verbose_name=_("فعال"))
-    autoplay = models.BooleanField(default=True, verbose_name=_("پخش خودکار"))
-    autoplay_interval_ms = models.PositiveIntegerField(default=5000, verbose_name=_("فاصله اسلایدها (میلی‌ثانیه)"))
-    pause_on_hover = models.BooleanField(default=True, verbose_name=_("توقف با هاور"))
-    wrap = models.BooleanField(default=True, verbose_name=_("گردش حلقه‌ای"))
-    show_indicators = models.BooleanField(default=True, verbose_name=_("نمایش نقطه‌ها"))
-    show_controls = models.BooleanField(default=True, verbose_name=_("نمایش دکمه‌های قبلی/بعدی"))
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = _("اسلایدر")
-        verbose_name_plural = _("اسلایدر")
-
-    def __str__(self):
-        return "اسلایدر بالای سایت"
-
-    @staticmethod
-    def get_solo():
-        obj = Slider.objects.first()
-        if not obj:
-            obj = Slider.objects.create()
-        return obj
-
-
-class Slide(models.Model):
-    slider = models.ForeignKey(Slider, related_name='slides', on_delete=models.CASCADE)
-    title = models.CharField(max_length=200, blank=True)
-    subtitle = models.CharField(max_length=300, blank=True)
-    button_label = models.CharField(max_length=80, blank=True)
-    button_url = models.CharField(max_length=200, blank=True)
-    image = models.ImageField(upload_to='slider/')
-    order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    start_at = models.DateTimeField(null=True, blank=True)
-    end_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['order', 'id']
-        verbose_name = _("اسلاید")
-        verbose_name_plural = _("اسلایدها")
-
-    def __str__(self):
-        return self.title or f"Slide #{self.pk}"
-
-    def is_currently_active(self):
-        now = timezone.now()
-        if not self.is_active:
-            return False
-        if self.start_at and now < self.start_at:
-            return False
-        if self.end_at and now > self.end_at:
-            return False
-        return True
