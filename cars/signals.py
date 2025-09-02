@@ -4,11 +4,9 @@ from django.apps import apps
 
 @receiver(post_migrate)
 def ensure_site_settings(sender, **kwargs):
-    # Create default SiteSettings after migrations if not exists
-    try:
-        SiteSettings = apps.get_model('cars', 'SiteSettings')
-        if SiteSettings and not SiteSettings.objects.exists():
-            SiteSettings.objects.create()
-    except Exception:
-        # Avoid crashing migrations if DB not ready
-        pass
+  try:
+    SiteSettings = apps.get_model('cars', 'SiteSettings')
+    if SiteSettings and not SiteSettings.objects.exists():
+      SiteSettings.objects.create()
+  except Exception:
+    pass
